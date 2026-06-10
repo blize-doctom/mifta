@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buku Kehidupan - Portal Portofolio &amp; Jurnal Digital Siswa</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Space Grotesk', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar for list-view */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F9FBF2;
+      border-radius: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2D3142;
+      border: 2px solid #F9FBF2;
+      border-radius: 8px;
+    }
+    /* Animate bounce custom keyframe */
+    @keyframes bounce-short {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+    .animate-bounce-short {
+      animation: bounce-short 2s infinite;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#F9FBF2] flex flex-col font-sans text-[#2D3142] selection:bg-[#FFD93D] selection:text-[#2D3142]"
+      x-data="bukuKehidupan()"
+      x-init="initApp()">
+
+  <!-- ======================== LOADING COVER ======================== -->
+  <div x-show="loading" class="fixed inset-0 bg-[#F9FBF2] z-50 flex flex-col items-center justify-center">
+    <div class="text-center space-y-4 bg-white border-4 border-[#2D3142] p-8 rounded-3xl shadow-[8px_8px_0px_0px_#2D3142] max-w-sm mx-4 transform -rotate-1">
+      <div class="bg-[#FFD93D] p-3 inline-block rounded-2xl border-4 border-[#2D3142] shadow-[2px_2px_0px_0px_#2D3142] animate-bounce">
+        <!-- SVG BookOpen Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-[#2D3142]"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      </div>
+      <h2 class="text-lg font-black uppercase tracking-tight font-display">Memuat Aplikasi</h2>
+      <p class="text-xs text-[#2D3142]/80 font-bold">Harap tunggu, sedang menyiapkan Buku Kehidupan Digital...</p>
+    </div>
+  </div>
+
+  <!-- MAIN APP CONTAINER -->
+  <div x-show="!loading" class="flex-1 flex flex-col">
+
+    <!-- ======================== LOGIN VIEW ======================== -->
+    <div x-show="view === 'login'" class="flex-1 flex flex-col justify-between py-12 px-4 sm:px-6 lg:px-8">
+      
+      <!-- HEADER HERO -->
+      <div class="max-w-4xl w-full mx-auto text-center space-y-4">
+        <div class="mx-auto h-20 w-20 flex items-center justify-center rounded-2xl bg-[#FFD93D] text-[#2D3142] border-4 border-[#2D3142] shadow-[6px_6px_0px_0px_#2D3142] transform -rotate-2">
+          <i data-lucide="book-open" class="h-10 w-10 stroke-[2.5]"></i>
+        </div>
+        <div>
+          <h1 class="text-4xl sm:text-5xl font-black text-[#2D3142] tracking-tighter uppercase font-display select-none">
+            BUKU KEHIDUPAN
+          </h1>
+          <p class="text-xs sm:text-sm text-[#FF6B6B] font-black tracking-widest uppercase select-none mt-1">
+            PORTAL PORTOFOLIO &amp; JURNAL DIGITAL SISWA
+          </p>
+        </div>
+      </div>
+
+      <!-- ERROR PANEL -->
+      <div x-show="loginError" class="max-w-2xl w-full mx-auto mt-6 bg-[#FF6B6B] border-4 border-[#2D3142] p-4 rounded-2xl shadow-[4px_4px_0px_0px_#2D3142] text-white">
+        <div class="flex">
+          <i data-lucide="alert-circle" class="h-5 w-5 text-white flex-shrink-0 mt-0.5"></i>
+          <div class="ml-3">
+            <p class="text-sm font-bold" x-text="loginError"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PORTAL GRID -->
+      <div class="max-w-4xl w-full mx-auto my-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 px-2">
+          
+          <!-- PORTAL SISWA -->
+          <div class="bg-white border-4 border-[#2D3142] rounded-3xl p-6 sm:p-8 shadow-[8px_8px_0px_0px_#2D3142] hover:shadow-[12px_12px_0px_0px_#2D3142] transition-all flex flex-col justify-between relative overflow-hidden group">
+            <div class="absolute top-0 right-0 bg-[#FFD93D] border-b-4 border-l-4 border-[#2D3142] text-[#2D3142] px-4 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-bl-2xl">
+              ROLE: SISWA
+            </div>
+            
+            <div class="space-y-4">
+              <div class="h-16 w-16 bg-[#FFD93D] rounded-2xl border-4 border-[#2D3142] shadow-[3px_3px_0px_0px_#2D3142] flex items-center justify-center text-3xl transform group-hover:-rotate-3 transition-transform">
+                📝
+              </div>
+              <div>
+                <h3 class="text-2xl font-black uppercase tracking-tight font-display flex items-center gap-1.5">
+                  Login Siswa
+                </h3>
+                <p class="text-xs text-[#2D3142]/75 font-semibold mt-2 leading-relaxed">
+                  Tulis refleksi harian/beasiswa kehidupan Anda, edit profil, unggah kenangan penting terbaik, serta simpan arsip perjalanan belajar digital Anda.
+                </p>
+              </div>
+
+              <div class="bg-[#F9FBF2] border-2 border-[#2D3142]/15 rounded-2xl p-4 space-y-3">
+                <label class="block text-[10px] font-black uppercase tracking-wider text-[#2D3142]/60">Nama Tampilan Simulasi (Demo)</label>
+                <input
+                  type="text"
+                  x-model="siswaDemoName"
+                  className="w-full px-3 py-2 bg-white border-4 border-[#2D3142] rounded-xl text-xs font-bold focus:outline-none text-[#2D3142] shadow-[2px_2px_0px_0px_#2D3142]"
+                  placeholder="Masukkan nama siswa"
+                  class="w-[calc(100%)] select-none px-3 py-2 bg-white border-4 border-[#2D3142] rounded-xl text-xs font-bold focus:outline-none text-[#2D3142] shadow-[2px_2px_0px_0px_#2D3142]"
+                />
+              </div>
+            </div>
+
+            <div class="mt-8">
+              <button
+                type="button"
+                @click="enterDemo('siswa', siswaDemoName)"
+                class="w-full py-4 px-4 bg-[#FFD93D] text-[#2D3142] border-4 border-[#2D3142] rounded-2xl font-black uppercase tracking-wider text-xs shadow-[4px_4px_0px_0px_#2D3142] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_0px_#2D3142] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-2"
+              >
+                Masuk Portal Siswa
+                <i data-lucide="arrow-right" class="h-4 w-4 stroke-[2.5]"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- PORTAL GURU -->
+          <div class="bg-white border-4 border-[#2D3142] rounded-3xl p-6 sm:p-8 shadow-[8px_8px_0px_0px_#FF6B6B] hover:shadow-[12px_12px_0px_0px_#FF6B6B] transition-all flex flex-col justify-between relative overflow-hidden group">
+            <div class="absolute top-0 right-0 bg-[#FF6B6B] border-b-4 border-l-4 border-[#2D3142] text-white px-4 py-1.5 text-[9px] font-black uppercase tracking-widest rounded-bl-2xl">
+              ROLE: GURU
+            </div>
+
+            <div class="space-y-4">
+              <div class="h-16 w-16 bg-[#FF6B6B] rounded-2xl border-4 border-[#2D3142] shadow-[3px_3px_0px_0px_#2D3142] flex items-center justify-center text-3xl transform group-hover:rotate-3 transition-transform">
+                👩‍🏫
+              </div>
+              <div>
+                <h3 class="text-2xl font-black uppercase tracking-tight font-display flex items-center gap-1.5">
+                  Login Guru / Konselor
+                </h3>
+                <p class="text-xs text-[#2D3142]/75 font-semibold mt-2 leading-relaxed">
+                  Tinjau tulisan refleksi siswa bimbingan Anda, berikan masukan pembetulan atau evaluasi portofolio guru langsung, dan monitor perkembangan jati diri.
+                </p>
+              </div>
+
+              <div class="bg-[#F9FBF2] border-2 border-[#2D3142]/15 rounded-2xl p-4 space-y-3">
+                <label class="block text-[10px] font-black uppercase tracking-wider text-[#2D3142]/60">Nama Tampilan Simulasi (Demo)</label>
+                <input
+                  type="text"
+                  x-model="guruDemoName"
+                  placeholder="Masukkan nama guru"
+                  class="w-[calc(100%)] px-3 py-2 bg-white border-4 border-[#2D3142] rounded-xl text-xs font-bold focus:outline-none text-[#2D3142] shadow-[2px_2px_0px_0px_#2D3142]"
+                />
+              </div>
+            </div>
+
+            <div class="mt-8">
+              <button
+                type="button"
+                @click="enterDemo('guru', guruDemoName)"
+                class="w-full py-4 px-4 bg-[#FF6B6B] text-white border-4 border-[#2D3142] rounded-2xl font-black uppercase tracking-wider text-xs shadow-[4px_4px_0px_0px_#2D3142] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_0px_#2D3142] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all cursor-pointer flex items-center justify-center gap-2"
+              >
+                Masuk Portal Guru
+                <i data-lucide="arrow-right" class="h-4 w-4 stroke-[2.5]"></i>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <div class="text-center text-xs text-[#2D3142]/60 font-bold space-y-1 select-none">
+        <p>© 2026 Buku Kehidupan Digital. Semua Hak Dilindungi.</p>
+        <p class="uppercase tracking-widest text-[9px] text-[#2D3142]/40">Sistem Pencatatan Refleksi Karakter &amp; Portofolio Siswa Terpercaya.</p>
+      </div>
+
+    </div>
+
+    <!-- ======================== SISWA DASHBOARD VIEW ======================== -->
+    <div x-show="view === 'siswa'" class="flex-1 flex flex-col">
+      <!-- HEADER BANNER -->
+      <header class="bg-[#FFD93D] text-[#2D3142] border-b-4 border-[#2D3142] shadow-[0px_4px_0px_0px_#2D3142] relative z-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div class="flex items-center space-x-3">
+            <div class="bg-[#2D3142] border-2 border-[#2D3142] p-2.5 rounded-xl text-white shadow-[2px_2px_0px_0px_#2D3142]">
+              <i data-lucide="book-open" class="h-8 w-8 text-[#FFD93D]"></i>
+            </div>
+            <div>
+              <h1 class="text-2xl font-black uppercase tracking-tighter text-[#2D3142] font-display flex flex-wrap items-center gap-2">
+                Buku Kehidupanku
+                <span class="bg-[#6BCB77] text-white border-2 border-[#2D3142] px-2.5 py-0.5 rounded-full text-[10px] font-black tracking-widest uppercase shadow-[1px_1px_0px_0px_#2D3142]">SISWA</span>
+              </h1>
+              <p class="text-xs text-[#2D3142]/85 flex flex-wrap items-center mt-1 gap-1.5">
+                <span class="font-bold flex items-center">
+                  <i data-lucide="user-check" class="h-3.5 w-3.5 mr-1 text-[#2D3142]"></i>
+                  Siswa: <span class="ml-1 text-[#2D3142] font-black" x-text="currentUserProfile.name"></span>
+                </span>
+                <span class="text-[#2D3142]/40">|</span>
+                <span class="bg-amber-500/10 text-[#FF6B6B] border border-[#FF6B6B]/30 px-1.5 py-0.2 rounded text-[10px] font-black">LOCAL STORAGE INTEGRATION</span>
+              </p>
+            </div>
+          </div>
+          <div>
+            <button
+              @click="logout()"
+              class="flex items-center gap-1.5 px-4 py-2 bg-white border-4 border-[#2D3142] rounded-xl text-xs font-black uppercase tracking-widest text-[#2D3142] transition-colors hover:bg-[#FF6B6B] hover:text-white shadow-[4px_4px_0px_0px_#2D3142] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[2px_2px_0px_0px_#2D3142] cursor-pointer"
+            >
+              <i data-lucide="log-out" class="h-4 w-4 text-[#FF6B6B]"></i>
+              Keluar Portal
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- MAIN CONTAINER -->
+      <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- TOAST STATUS / MESSAGES -->
+        <template x-if="successMsg">
+          <div class="mb-6 bg-[#6BCB77] border-4 border-[#2D3142] text-white px-4 py-3.5 rounded-2xl flex items-center gap-2.5 shadow-[4px_4px_0px_0px_#2D3142] text-xs sm:text-sm font-black uppercase tracking-wider animate-bounce-short">
+            <i data-lucide="sparkles" class="h-5 w-5 text-white animate-pulse"></i>
+            <span x-text="successMsg"></span>
+          </div>
+        </template>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          <!-- COLUMN 1: CHAPTER MENU (lg:col-span-4) -->
+          <section class="lg:col-span-4 space-y-4">
+            <div class="bg-white border-4 border-[#2D3142] rounded-3xl p-5 shadow-[8px_8px_0px_0px_#2D3142] space-y-4">
+              <h2 class="text-xs font-black uppercase tracking-widest text-[#2D3142]/60">Bab Buku Digital</h2>
+              <div class="space-y-3">
+                <template x-for="chapter in chapters" :key="chapter.id">
+                  <button
+                    @click="selectChapter(chapter.id)"
+                    class="w-full text-left p-3.5 rounded-2xl border-4 text-[#2D3142] flex items-center justify-between transition-all cursor-pointer"
+                    :class="selectedChapterId === chapter.id ? 'bg-[#FFD93D] border-[#2D3142] shadow-[4px_4px_0px_0px_#2D3142] -rotate-1 font-black' : 'bg-white border-[#2D3142]/10 hover:border-[#2D3142] font-semibold'"
+                  >
+                    <div class="flex items-center space-x-3 overflow-hidden">
+                      <div class="h-8 w-8 rounded-lg border-2 border-[#2D3142] flex items-center justify-center flex-shrink-0"
+                           :class="selectedChapterId === chapter.id ? 'bg-white' : 'bg-[#FFD93D]/10'">
+                        <!-- Display corresponding chapter emoji icon -->
+                        <span x-text="getChapterEmoji(chapter.id)"></span>
+                      </div>
+                      <div class="overflow-hidden">
+                        <span class="text-xs uppercase block tracking-wider text-[9px] text-[#2D3142]/60">
+                          BAB <span x-text="chapter.id.substring(3)"></span>
+                        </span>
+                        <h4 class="text-xs truncate" x-text="chapter.title.split(': ')[1]"></h4>
+                      </div>
+                    </div>
+                    <i data-lucide="chevron-right" class="h-4 w-4 flex-shrink-0" :class="selectedChapterId === chapter.id ? 'text-[#2D3142]' : 'text-slate-300'"></i>
+                  </button>
+                </template>
+              </div>
+            </div>
+
+            <!-- PORTOFOLIO SUMMARY GUIDE -->
+            <div class="bg-[#6BCB77] border-4 border-[#2D3142] text-white rounded-3xl p-6 shadow-[8px_8px_0px_0px_#2D3142] space-y-2 transform rotate-1">
+              <h4 class="text-xs font-black uppercase tracking-widest text-[#FFD93D] flex items-center gap-1.5">
+                📚 Jurnal Refleksi Siswa
+              </h4>
+              <p class="text-xs text-white/95 leading-relaxed font-semibold">
+                Buku Kehidupan adalah jurnal rekaman karakter &amp; capaian penting yang mendampingi bimbingan konseling dan pendaftaran beasiswa belajar Anda. Tulis setiap bab dengan jujur dan bersiaplah merebut prestasi masa depan!
+              </p>
+            </div>
+          </section>
+
+          <!-- COLUMN 2: ACTIVE CHAPTER LOGS & ACTIONS (lg:col-span-8) -->
+          <section class="lg:col-span-8 space-y-6">
+
+            <!-- ACTIVE CHAPTER DETAIL CARD -->
+            <div class="bg-white border-4 border-[#2D3142] rounded-3xl p-6 space-y-6 shadow-[8px_8px_0px_0px_#2D3142]">
+              
+              <!-- Chapter Title Banner -->
+              <div class="flex items-center space-x-3 border-b-4 border-[#2D3142] pb-4">
+                <div class="p-3 bg-[#FFD93D] text-[#2D3142] border-4 border-[#2D3142] rounded-xl shadow-[4px_4px_0px_0px_#2D3142] transform -rotate-1">
+                  <span class="text-xl" x-text="getChapterEmoji(selectedChapterId)"></span>
+                </div>
+                <div>
+                  <span class="text-[10px] font-black text-[#FF6B6B] uppercase tracking-widest">Bab Terpilih</span>
+                  <h3 class="text-lg font-black text-[#2D3142] tracking-tight uppercase font-display mt-0.5" x-text="getActiveChapter().title"></h3>
+                  <p class="text-xs text-slate-500 font-semibold mt-0.5 italic text-[#2D3142]/75">
+                    "<span x-text="getActiveChapter().guidelines"></span>"
+                  </p>
+                </div>
+              </div>
+
+              <!-- BUTTON TO TRIGGER INPUT REFLECTION -->
+              <div x-show="!isAddingEntry">
+                <button
+                  @click="isAddingEntry = true; entryContent = ''"
+                  class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-4 border-[#2D3142] bg-[#FFD93D] text-[#2D3142] hover:bg-[#FFD93D]/95 hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_0px_#2D3142] active:translate-x-1 active:translate-y-1 active:shadow-none font-black text-xs uppercase tracking-wider transition-all shadow-[4px_4px_0px_0px_#2D3142] cursor-pointer"
+                >
+                  <i data-lucide="plus" class="h-4 w-4 stroke-[2.5]"></i>
+                  Tulis Refleksi Baru Pada Bab Ini
+                </button>
+              </div>
+
+              <!-- ENTRY WRITING FORM -->
+              <div x-show="isAddingEntry" class="space-y-4 border-4 border-[#2D3142] rounded-2xl p-5 bg-[#F9FBF2]/50 shadow-[4px_4px_0px_0px_#2D3142]">
+                <div class="flex justify-between items-center pb-2 border-b-2 border-[#2D3142]/15">
+                  <span class="text-xs font-black text-[#2D3142] uppercase tracking-widest flex items-center gap-1.5">
+                    ✍️ Klik Tulisan &amp; Menuangkan Refleksi
+                  </span>
+                  <button
+                    @click="isAddingEntry = false; entryContent = ''"
+                    class="text-slate-500 hover:text-red-500 cursor-pointer"
+                  >
+                    <i data-lucide="x" class="h-4 w-4 stroke-[2.5]"></i>
+                  </button>
+                </div>
+
+                <div class="space-y-1">
+                  <textarea
+                    x-model="entryContent"
+                    rows="5"
+                    placeholder="Tulis refleksi pikiran, bakat, kelemahan, kejujuran hidup Anda di sini..."
+                    class="w-full p-4 bg-white border-4 border-[#2D3142] rounded-xl focus:outline-none focus:ring-0 focus:border-[#4D96FF] text-sm text-[#2D3142] font-semibold transition-all shadow-[2px_2px_0px_0px_#2D3142] focus:shadow-[4px_4px_0px_0px_#2D3142]"
+                  ></textarea>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-1">
+                  <button
+                    type="button"
+                    @click="isAddingEntry = false"
+                    class="px-5 py-2.5 text-xs font-black uppercase tracking-wider border-4 border-[#2D3142] text-[#2D3142] rounded-xl hover:bg-slate-50 bg-white cursor-pointer"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="button"
+                    @click="submitSiswaEntry()"
+                    class="px-5 py-2.5 text-xs font-black uppercase tracking-wider bg-[#6BCB77] text-white border-4 border-[#2D3142] rounded-xl hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_0px_#2D3142] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all shadow-[4px_4px_0px_0px_#2D3142] cursor-pointer flex items-center gap-1.5"
+                  >
+                    <i data-lucide="send" class="h-3.5 w-3.5"></i>
+                    Kirim Refleksi
+                  </button>
+                </div>
+              </div>
+
+              <!-- TIMELINE LOGS -->
+              <div class="space-y-4">
+                <h4 class="text-xs font-black uppercase tracking-widest text-[#2D3142]/60">Catatan &amp; Umpan Balik Guru</h4>
+                
+                <!-- If No Items -->
+                <div x-show="getActiveChapterEntries().length === 0" class="bg-[#F9FBF2]/40 rounded-2xl border-4 border-dashed border-[#2D3142]/25 p-8 text-center text-[#2D3142]/65 space-y-2">
+                  <p class="text-2xl">📭</p>
+                  <p class="text-xs font-black uppercase">Belum Ada Catatan</p>
+                  <p class="text-[10px] font-semibold text-slate-500">Anda belum menulis refleksi atau guru belum mengisi feedback di bab ini.</p>
+                </div>
+
+                <!-- If Items Exist -->
+                <div x-show="getActiveChapterEntries().length > 0" class="space-y-6 relative before:absolute before:inset-y-1 before:left-[17px] before:w-1 before:bg-[#2D3142]">
+                  <template x-for="entry in getActiveChapterEntries()" :key="entry.entryId">
+                    <div class="relative pl-10">
+                      
+                      <!-- Timeline Node Icon -->
+                      <div class="absolute left-0 top-1 p-1.5 rounded-full z-10 border-2 border-[#2D3142]"
+                           :class="entry.authorRole === 'guru' ? 'bg-[#FFD93D] text-[#2D3142]' : 'bg-[#6BCB77] text-white'">
+                        <span x-text="entry.authorRole === 'guru' ? '👩‍🏫' : '📝'"></span>
+                      </div>
+
+                      <!-- Card Content -->
+                      <div class="bg-white border-4 border-[#2D3142] rounded-3xl p-5 space-y-4 transition-all"
+                           :class="entry.authorRole === 'guru' ? 'shadow-[6px_6px_0px_0px_#FF6B6B] bg-[#F9FBF2]/50 transform rotate-[1deg]' : 'shadow-[6px_6px_0px_0px_#2D3142]'">
+                        
+                        <div class="flex justify-between items-start gap-4">
+                          <div>
+                            <div class="flex flex-wrap items-center gap-2">
+                              <span class="text-[13px] font-black" :class="entry.authorRole === 'guru' ? 'text-amber-950' : 'text-[#2D3142]'" x-text="entry.authorName"></span>
+                              <span class="px-2 py-0.5 rounded-full border-2 border-[#2D3142] text-[9px] font-black uppercase tracking-widest shadow-[1px_1px_0px_0px_#2D3142]"
+                                    :class="entry.authorRole === 'guru' ? 'bg-[#FFD93D] text-[#2D3142]' : 'bg-[#6BCB77] text-white'"
+                                    x-text="entry.authorRole === 'guru' ? 'Guru' : 'Siswa'"></span>
+                            </div>
+                            <p class="text-[10px] uppercase font-bold text-[#2D3142]/65 flex items-center mt-1">
+                              <i data-lucide="calendar" class="h-3.5 w-3.5 mr-1 text-[#2D3142]"></i>
+                              <span x-text="formatDate(entry.createdAt)"></span>
+                            </p>
+                          </div>
+
+                          <!-- Actions if student's own entry -->
+                          <div x-show="entry.authorId === currentUserProfile.uid &amp;&amp; editingEntryId !== entry.entryId" class="flex items-center gap-1 bg-[#F9FBF2] p-1 rounded-lg border-2 border-[#2D3142]/15">
+                            <button
+                              @click="startEditingEntry(entry)"
+                              class="p-1.5 text-slate-500 hover:text-emerald-700 hover:bg-white rounded cursor-pointer transition-all"
+                              title="Ubah Catatan"
+                            >
+                              <i data-lucide="edit-2" class="h-3 w-3"></i>
+                            </button>
+                            <button
+                              @click="deleteEntry(entry.entryId)"
+                              class="p-1.5 text-slate-500 hover:text-red-600 hover:bg-white rounded cursor-pointer transition-all"
+                              title="Hapus Catatan"
+                            >
+                              <i data-lucide="trash-2" class="h-3 w-3"></i>
+                            </button>
+                          </div>
+                        </div>
+
+                        <!-- Editable Content Textarea -->
+                        <div x-show="editingEntryId === entry.entryId" class="space-y-3 pt-1">
+                          <textarea
+                            x-model="editText"
+                            class="w-full p-3 bg-white border-4 border-[#2D3142] rounded-xl text-sm font-semibold text-[#2D3142]"
+                          ></textarea>
+                          <div class="flex justify-end gap-2 text-xs">
+                            <button
+                              @click="cancelEdit()"
+                              class="px-3 py-1.5 border-2 border-[#2D3142] bg-white text-[#2D3142] rounded-lg font-black uppercase"
+                            >
+                              Batal
+                            </button>
+                            <button
+                              @click="saveEntryEdit(entry.entryId)"
+                              class="px-3 py-1.5 bg-[#6BCB77] text-white border-2 border-[#2D3142] font-black uppercase rounded-lg shadow-[2px_2px_0px_0px_#2D3142]"
+                            >
+                              Simpan
+                            </button>
+                          </div>
+                        </div>
+
+                        <!-- Text content -->
+                        <p x-show="editingEntryId !== entry.entryId" class="text-sm font-medium text-[#2D3142]/90 leading-relaxed whitespace-pre-line" x-text="entry.content"></p>
+
+                      </div>
+
+                    </div>
+                  </template>
+                </div>
+
+              </div>
+
+            </div>
+
+          </section>
+
+        </div>
+
+      </main>
+    </div>
+
+    <!-- ======================== GURU DASHBOARD VIEW ======================== -->
+    <div x-show="view === 'guru'" class="flex-1 flex flex-col">
+      <!-- HEADER BANNER -->
+      <header class="bg-[#FF9F1C] text-[#2D3142] border-b-4 border-[#2D3142] shadow-[0px_4px_0px_0px_#2D3142] relative z-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div class="flex items-center space-x-3">
+            <div class="bg-[#2D3142] border-2 border-[#2D3142] p-2.5 rounded-xl text-white shadow-[2px_2px_0px_0px_#2D3142]">
+              <i data-lucide="book-open" class="h-8 w-8 text-[#FFD93D]"></i>
+            </div>
+            <div>
+              <h1 class="text-2xl font-black uppercase tracking-tighter text-[#2D3142] font-display flex flex-wrap items-center gap-2">
+                Portal Guru: Buku Kehidupan 
+                <span class="bg-[#FF6B6B] text-white border-2 border-[#2D3142] px-2 py-0.5 rounded-full text-[10px] font-black tracking-widest uppercase shadow-[1px_1px_0px_0px_#2D3142]">GURU</span>
+              </h1>
+              <p class="text-xs text-[#2D3142]/85 flex flex-wrap items-center mt-1 gap-1.5">
+                <span class="font-bold flex items-center">
+                  <i data-lucide="user-check" class="h-3.5 w-3.5 mr-1 text-[#2D3142]"></i> Pendidik: <span class="ml-1 text-[#2D3142] font-black" x-text="currentUserProfile.name"></span>
+                </span>
+                <span class="text-[#2D3142]/40">|</span>
+                <span class="bg-amber-500/10 text-red-600 border border-[#FF6B6B]/30 px-1.5 py-0.2 rounded text-[10px] font-black">LOCAL STORAGE INTEGRATION</span>
+              </p>
+            </div>
+          </div>
+          <div>
+            <button
+              @click="logout()"
+              class="flex items-center gap-1.5 px-4 py-2 bg-white border-4 border-[#2D3142] rounded-xl text-xs font-black uppercase tracking-widest text-[#2D3142] transition-colors hover:bg-[#FF6B6B] hover:text-white shadow-[4px_4px_0px_0px_#2D3142] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[2px_2px_0px_0px_#2D3142] cursor-pointer"
+            >
+              <i data-lucide="log-out" class="h-4 w-4 text-[#FF6B6B]"></i>
+              Keluar Portal
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- MAIN CONTAINER -->
+      <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- MESSAGES & ADVISORIES -->
+        <template x-if="successMsg">
+          <div class="mb-6 bg-[#6BCB77] border-4 border-[#2D3142] text-white px-4 py-3 rounded-2xl flex items-center gap-2.5 shadow-[4px_4px_0px_0px_#2D3142] text-sm font-black uppercase tracking-wider animate-bounce-short">
+            <i data-lucide="sparkles" class="h-5 w-5 text-white animate-pulse"></i>
+            <span x-text="successMsg"></span>
+          </div>
+        </template>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          <!-- COLUMN 1: STUDENT LIST (lg:col-span-4) -->
+          <section class="lg:col-span-4 space-y-4">
+            <div class="bg-white border-4 border-[#2D3142] rounded-3xl p-5 shadow-[8px_8px_0px_0px_#2D3142] space-y-4">
+              <div class="flex justify-between items-center">
+                <h2 class="text-xs font-black uppercase tracking-widest text-[#2D3142]/60 font-display">Daftar Siswa</h2>
+                <span class="bg-[#FFD93D] text-[#2D3142] border-2 border-[#2D3142] text-xs font-black px-2.5 py-0.5 rounded-full shadow-[1px_1px_0px_0px_#2D3142]">
+                  <span x-text="getFilteredStudents().length"></span> Siswa
+                </span>
+              </div>
+
+              <!-- SEARCH INPUT -->
+              <div class="relative text-[#2D3142]">
+                <span class="absolute left-3 top-3.5 h-4 w-4 text-slate-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                </span>
+                <input
+                  type="text"
+                  x-model="searchQuery"
+                  placeholder="Cari nama atau email siswa..."
+                  class="w-[calc(100%)] pl-9 pr-4 py-2.5 border-4 border-[#2D3142] rounded-xl text-xs bg-white focus:outline-none focus:border-[#4D96FF] text-[#2D3142] font-semibold shadow-[2px_2px_0px_0px_#2D3142]"
+                />
+              </div>
+
+              <!-- STUDENTS SCALING LIST -->
+              <div class="space-y-2 max-h-[480px] overflow-y-auto pr-1">
+                <template x-for="student in getFilteredStudents()" :key="student.studentId">
+                  <button
+                    @click="selectStudent(student)"
+                    class="w-[calc(100%-8px)] text-left p-3 rounded-xl border-4 flex items-center justify-between transition-all cursor-pointer m-1"
+                    :class="selectedStudent &amp;&amp; selectedStudent.studentId === student.studentId ? 'bg-[#FFD93D] border-[#2D3142] text-[#2D3142] shadow-[4px_4px_0px_0px_#2D3142] transform -rotate-1 font-black' : 'bg-white border-[#2D3142]/10 text-[#2D3142] hover:border-[#2D3142] font-semibold'"
+                  >
+                    <div class="flex items-center space-x-3 overflow-hidden">
+                      <div class="h-8 w-8 rounded-lg border-2 border-[#2D3142] flex items-center justify-center font-black text-xs flex-shrink-0"
+                           :class="selectedStudent &amp;&amp; selectedStudent.studentId === student.studentId ? 'bg-white text-[#2D3142]' : 'bg-[#6BCB77] text-white'">
+                        <span x-text="student.studentName.charAt(0).toUpperCase()"></span>
+                      </div>
+                      <div class="overflow-hidden">
+                        <h4 class="text-xs font-black truncate uppercase" x-text="student.studentName"></h4>
+                        <p class="text-[10px] truncate" :class="selectedStudent &amp;&amp; selectedStudent.studentId === student.studentId ? 'text-[#2D3142]/70' : 'text-slate-500'" x-text="student.studentEmail"></p>
+                      </div>
+                    </div>
+                    <i data-lucide="chevron-right" class="h-4 w-4 flex-shrink-0" :class="selectedStudent &amp;&amp; selectedStudent.studentId === student.studentId ? 'text-[#2D3142]' : 'text-slate-300'"></i>
+                  </button>
+                </template>
+
+                <div x-show="getFilteredStudents().length === 0" class="text-center py-8 text-[#2D3142]/60 font-bold text-xs">Siswa tidak ditemukan</div>
+              </div>
+
+            </div>
+
+            <!-- ADVISORY BANNER FOR TEACHERS -->
+            <div class="bg-[#FF6B6B] border-4 border-[#2D3142] text-white rounded-3xl p-6 shadow-[8px_8px_0px_0px_#2D3142] space-y-2 transform rotate-1">
+              <h4 class="text-xs font-black uppercase tracking-widest text-[#FFD93D] flex items-center gap-1.5">
+                👩‍🏫 Bimbingan Konseling Guru
+              </h4>
+              <p class="text-xs text-white/95 leading-relaxed font-semibold">
+                Gunakan portal penasihat ini untuk membaca rekaman refleksi belajar siswa pilihan Anda. Berikan masukan, bimbingan, catatan perbaikan, atau apresiasi penghargaan beasiswa karakter pada Bab berjalan.
+              </p>
+            </div>
+          </section>
+
+          <!-- COLUMN 2: SELECTED STUDENT DETAIL VIEW (lg:col-span-8) -->
+          <section class="lg:col-span-8 space-y-6">
+
+            <!-- Profile Overview Bar -->
+            <template x-if="selectedStudent">
+              <div class="space-y-6">
+                
+                <!-- Profile Header Card -->
+                <div class="bg-white border-4 border-[#2D3142] rounded-3xl p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-[8px_8px_0px_0px_#2D3142]">
+                  <div class="flex items-center space-x-3.5">
+                    <div class="h-12 w-12 rounded-2xl bg-[#6BCB77] border-4 border-[#2D3142] text-white font-black text-lg flex items-center justify-center shadow-[2px_2px_0px_0px_#2D3142] transform -rotate-2">
+                      <span x-text="selectedStudent.studentName.substring(0, 2).toUpperCase()"></span>
+                    </div>
+                    <div>
+                      <span class="text-[10px] font-black text-[#2D3142] bg-[#FFD93D] border-2 border-[#2D3142] px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-[1px_1px_0px_0px_#2D3142]">
+                        Buku Digital Siswa
+                      </span>
+                      <h2 class="text-xl font-black text-[#2D3142] tracking-tight uppercase font-display mt-1" x-text="selectedStudent.studentName"></h2>
+                      <p class="text-xs text-[#2D3142]/75 font-semibold" x-text="selectedStudent.studentEmail"></p>
+                    </div>
+                  </div>
+                  <div class="text-[#2D3142]/70 text-[11px] font-black uppercase tracking-wider border-l-0 sm:border-l-4 sm:border-[#2D3142]/10 sm:pl-5 pt-2 sm:pt-0 max-w-xs leading-relaxed">
+                    Status Buku Kehidupan:<br>
+                    <span class="font-extrabold text-[#2D3142]">AKTIF / TERVERIFIKASI</span>
+                  </div>
+                </div>
+
+                <!-- Portfolio Chapters Navigation Grid -->
+                <span class="text-xs font-black uppercase tracking-widest text-[#2D3142]/60 block ml-1">Pilih Bab Portofolio</span>
+                <div class="grid grid-cols-5 gap-2.5">
+                  <template x-for="chapter in chapters" :key="chapter.id">
+                    <button
+                      @click="selectedChapterId = chapter.id; isAddingComment = false; editingEntryId = null"
+                      class="p-3 rounded-2xl border-4 flex flex-col items-center justify-center text-center transition-all cursor-pointer"
+                      :class="selectedChapterId === chapter.id ? 'bg-[#6BCB77] border-[#2D3142] text-white shadow-[4px_4px_0px_0px_#2D3142] transform -rotate-2 font-black' : 'bg-white border-[#2D3142]/20 text-[#2D3142] hover:border-[#2D3142] hover:bg-slate-50 font-semibold'"
+                    >
+                      <span class="text-xl mb-1" x-text="getChapterEmoji(chapter.id)"></span>
+                      <span class="text-[10px] uppercase tracking-widest hidden sm:inline" x-text="chapter.id.toUpperCase()"></span>
+                    </button>
+                  </template>
+                </div>
+
+                <!-- Active Chapter Detail inside selected student book -->
+                <div class="bg-white border-4 border-[#2D3142] rounded-3xl p-6 space-y-6 shadow-[8px_8px_0px_0px_#2D3142]">
+                  
+                  <!-- Active Chapter label -->
+                  <div class="flex items-center space-x-3 border-b-4 border-[#2D3142] pb-4">
+                    <div class="p-3 bg-[#4D96FF] text-white border-4 border-[#2D3142] rounded-xl shadow-[4px_4px_0px_0px_#2D3142] transform -rotate-1">
+                      <span class="text-xl" x-text="getChapterEmoji(selectedChapterId)"></span>
+                    </div>
+                    <div>
+                      <span class="text-[10px] font-black text-[#FF6B6B] uppercase tracking-widest">Bab Terpilih</span>
+                      <h3 class="text-lg font-black text-[#2D3142] tracking-tight uppercase font-display mt-0.5" x-text="getActiveChapter().title"></h3>
+                      <p class="text-xs text-slate-500 font-semibold mt-0.5 italic text-[#2D3142]/70">
+                        "<span x-text="getActiveChapter().guidelines"></span>"
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Teacher entry/feedback adding button trigger -->
+                  <div x-show="!isAddingComment">
+                    <button
+                      @click="isAddingComment = true; commentContent = ''"
+                      class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border-4 border-[#2D3142] bg-[#FFD93D] text-[#2D3142] hover:bg-[#FFD93D]/95 hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_0px_#2D3142] active:translate-x-1 active:translate-y-1 active:shadow-none font-black text-xs uppercase tracking-wider transition-all shadow-[4px_4px_0px_0px_#2D3142] cursor-pointer"
+                    >
+                      <i data-lucide="plus" class="h-4 w-4 stroke-[2.5]"></i>
+                      Berikan Evaluasi / Catatan Guru pada Bab Ini
+                    </button>
+                  </div>
+
+                  <!-- Writing evaluation/comment form -->
+                  <div x-show="isAddingComment" class="space-y-4 border-4 border-[#2D3142] rounded-2xl p-5 bg-[#F9FBF2]/50 shadow-[4px_4px_0px_0px_#2D3142]">
+                    <div class="flex justify-between items-center pb-2 border-b-2 border-[#2D3142]/15">
+                      <span class="text-xs font-black text-[#2D3142] uppercase tracking-widest flex items-center gap-1.5">
+                        ✍️ Tulis Saran / Masukan Bimbingan
+                      </span>
+                      <button
+                        @click="isAddingComment = false; commentContent = ''"
+                        class="text-slate-500 hover:text-red-500 cursor-pointer"
+                      >
+                        <i data-lucide="x" class="h-4 w-4 stroke-[2.5]"></i>
+                      </button>
+                    </div>
+
+                    <div>
+                      <textarea
+                        x-model="commentContent"
+                        rows="4"
+                        placeholder="Berikan masukan konstruktif atas refleksi yang ditulis oleh siswa..."
+                        class="w-full p-4 bg-white border-4 border-[#2D3142] rounded-xl focus:outline-none focus:ring-0 focus:border-[#4D96FF] text-sm text-[#2D3142] font-semibold transition-all shadow-[2px_2px_0px_0px_#2D3142] focus:shadow-[4px_4px_0px_0px_#2D3142]"
+                      ></textarea>
+                    </div>
+
+                    <div class="flex justify-end gap-3 pt-1">
+                      <button
+                        type="button"
+                        @click="isAddingComment = false"
+                        class="px-5 py-2.5 text-xs font-black uppercase tracking-wider border-4 border-[#2D3142] text-[#2D3142] rounded-xl hover:bg-slate-50 bg-white cursor-pointer"
+                      >
+                        Batal
+                      </button>
+                      <button
+                        type="button"
+                        @click="submitGuruComment()"
+                        class="px-5 py-2.5 text-xs font-black uppercase tracking-wider bg-[#6BCB77] text-white border-4 border-[#2D3142] rounded-xl hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_0px_#2D3142] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all shadow-[4px_4px_0px_0px_#2D3142] cursor-pointer flex items-center gap-1.5"
+                      >
+                        <i data-lucide="send" class="h-3.5 w-3.5"></i>
+                        Kirim Catatan Guru
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Active student active chapter timeline data -->
+                  <div class="space-y-4">
+                    <h4 class="text-xs font-black uppercase tracking-widest text-[#2D3142]/60">Arsip Bab Ini</h4>
+                    
+                    <!-- If Empty -->
+                    <div x-show="getSelectedStudentEntries().length === 0" class="bg-[#F9FBF2]/40 rounded-2xl border-4 border-dashed border-[#2D3142]/25 p-8 text-center text-[#2D3142]/65 space-y-2">
+                      <p class="text-2xl">📭</p>
+                      <p class="text-xs font-black uppercase">Belum Ada Catatan</p>
+                      <p class="text-[10px] font-semibold text-slate-500">Siswa belum menulis refleksi atau guru belum mengisi feedback.</p>
+                    </div>
+
+                    <!-- If Populated -->
+                    <div x-show="getSelectedStudentEntries().length > 0" class="space-y-6 relative before:absolute before:inset-y-1 before:left-[17px] before:w-1 before:bg-[#2D3142]">
+                      <template x-for="entry in getSelectedStudentEntries()" :key="entry.entryId">
+                        <div class="relative pl-10">
+                          
+                          <!-- Timeline Node Icon -->
+                          <div class="absolute left-0 top-1 p-1.5 rounded-full z-10 border-2 border-[#2D3142]"
+                               :class="entry.authorRole === 'guru' ? 'bg-[#FFD93D] text-[#2D3142]' : 'bg-[#6BCB77] text-white'">
+                            <span x-text="entry.authorRole === 'guru' ? '👩‍🏫' : '📝'"></span>
+                          </div>
+
+                          <!-- Inner Card Body -->
+                          <div class="bg-white border-4 border-[#2D3142] rounded-3xl p-5 space-y-4 transition-all"
+                               :class="entry.authorRole === 'guru' ? 'shadow-[6px_6px_0px_0px_#FF6B6B] bg-[#F9FBF2]/50 transform rotate-[1deg]' : 'shadow-[6px_6px_0px_0px_#2D3142]'">
+                            
+                            <div class="flex justify-between items-start gap-4">
+                              <div>
+                                <div class="flex flex-wrap items-center gap-2">
+                                  <span class="text-[13px] font-black" :class="entry.authorRole === 'guru' ? 'text-amber-955' : 'text-[#2D3142]'" x-text="entry.authorName"></span>
+                                  <span class="px-2 py-0.5 rounded-full border-2 border-[#2D3142] text-[9px] font-black uppercase tracking-widest shadow-[1px_1px_0px_0px_#2D3142]"
+                                        :class="entry.authorRole === 'guru' ? 'bg-[#FFD93D] text-[#2D3142]' : 'bg-[#6BCB77] text-white'"
+                                        x-text="entry.authorRole === 'guru' ? 'Guru' : 'Siswa'"></span>
+                                </div>
+                                <p class="text-[10px] uppercase font-bold text-[#2D3142]/65 flex items-center mt-1">
+                                  <i data-lucide="calendar" class="h-3.5 w-3.5 mr-1 text-[#2D3142]"></i>
+                                  <span x-text="formatDate(entry.createdAt)"></span>
+                                </p>
+                              </div>
+
+                              <!-- Delete/edit available only if comments made by CURRENT teacher uid -->
+                              <div x-show="entry.authorId === currentUserProfile.uid &amp;&amp; editingEntryId !== entry.entryId" class="flex items-center gap-1 bg-[#F9FBF2] p-1 rounded-lg border-2 border-[#2D3142]/15">
+                                <button
+                                  @click="startEditingEntry(entry)"
+                                  class="p-1.5 text-slate-500 hover:text-[#6BCB77] hover:bg-white rounded cursor-pointer transition-all"
+                                  title="Ubah Catatan"
+                                >
+                                  <i data-lucide="edit-2" class="h-3 w-3"></i>
+                                </button>
+                                <button
+                                  @click="deleteEntry(entry.entryId)"
+                                  class="p-1.5 text-slate-500 hover:text-red-600 hover:bg-white rounded cursor-pointer transition-all"
+                                  title="Hapus Catatan"
+                                >
+                                  <i data-lucide="trash-2" class="h-3 w-3"></i>
+                                </button>
+                              </div>
+                            </div>
+
+                            <!-- Comment text editing frame -->
+                            <div x-show="editingEntryId === entry.entryId" class="space-y-3 pt-1">
+                              <textarea
+                                x-model="editText"
+                                class="w-full p-3 bg-white border-4 border-[#2D3142] rounded-xl text-sm font-semibold text-[#2D3142]"
+                              ></textarea>
+                              <div class="flex justify-end gap-2 text-xs">
+                                <button
+                                  @click="cancelEdit()"
+                                  class="px-3 py-1.5 border-2 border-[#2D3142] bg-white text-[#2D3142] rounded-lg font-black uppercase"
+                                >
+                                  Batal
+                                </button>
+                                <button
+                                  @click="saveEntryEdit(entry.entryId)"
+                                  class="px-3 py-1.5 bg-[#6BCB77] text-white border-2 border-[#2D3142] font-black uppercase rounded-lg shadow-[2px_2px_0px_0px_#2D3142]"
+                                >
+                                  Simpan
+                                </button>
+                              </div>
+                            </div>
+
+                            <!-- Display actual comment body -->
+                            <p x-show="editingEntryId !== entry.entryId" class="text-sm font-semibold text-[#2D3142]/90 leading-relaxed whitespace-pre-line" x-text="entry.content"></p>
+
+                          </div>
+
+                        </div>
+                      </template>
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+            </template>
+
+            <!-- Fallback if no student selected -->
+            <template x-if="!selectedStudent">
+              <div class="bg-white border-4 border-[#2D3142] rounded-3xl p-12 text-center text-[#2D3142]/60 shadow-[8px_8px_0px_0px_#2D3142] space-y-3">
+                <p class="text-4xl">📭</p>
+                <p class="text-base font-black uppercase tracking-tight font-display">Pilih Siswa Terlebih Dahulu</p>
+                <p class="text-xs text-slate-500 max-w-sm mx-auto font-medium">
+                  Silakan pilih nama siswa dari menu daftar sebelah kiri untuk memproses, membaca, dan mengevaluasi buku kehidupan digital miliknya.
+                </p>
+              </div>
+            </template>
+
+          </section>
+
+        </div>
+
+      </main>
+    </div>
+
+  </div>
+
+  <!-- STATE MANAGEMENT ENGINE -->
+  <script>
+    function bukuKehidupan() {
+      return {
+        // App Core states
+        view: 'login', // 'login', 'siswa', 'guru'
+        loading: false,
+        loginError: '',
+        successMsg: '',
+        
+        // Profiles & States
+        currentUserProfile: null,
+        siswaDemoName: 'Ahmad Dahlan',
+        guruDemoName: 'Bu Kartini, S.Pd.',
+        
+        // Book Chapters Static Schema
+        chapters: [
+          {
+            id: 'bab1',
+            title: 'Bab 1: Tentang Aku',
+            guidelines: 'Tuliskan siapa dirimu, dari mana asalmu, apa saja kegemaranmu, bagaimana keluargamu, dan cerita menarik tentang dirimu.'
+          },
+          {
+            id: 'bab2',
+            title: 'Bab 2: Kelebihanku',
+            guidelines: 'Apa bakat terpendammu? Karakter positif apa yang sering dipuji orang lain? Keterampilan atau prestasi apa yang paling kamu banggakan?'
+          },
+          {
+            id: 'bab3',
+            title: 'Bab 3: Tantanganku',
+            guidelines: 'Apa mata pelajaran paling sulit bagimu? Ketakutan atau hambatan apa yang sedang kamu hadapi di sekolah maupun kehidupan? Bagaimana caramu bangkit dari kegagalan?'
+          },
+          {
+            id: 'bab4',
+            title: 'Bab 4: Cita-citaku',
+            guidelines: 'Saat lulus nanti, apa profesi atau karier impianmu? Mengapa kamu memilih hal tersebut dan langkah apa saja yang sudah kamu mulai sekarang?'
+          },
+          {
+            id: 'bab5',
+            title: 'Bab 5: Masa Depanku',
+            guidelines: 'Bagaimana kamu membayangkan dirimu 10 tahun dari sekarang? Apa kontribusi terbesar yang ingin kamu berikan ke dunia atau keluargamu? Tulis pesan penyemangat untuk dirimu sendiri!'
+          }
+        ],
+
+        // Selected elements
+        selectedChapterId: 'bab1',
+        selectedStudent: null,
+        searchQuery: '',
+        
+        // Data Collections
+        students: [],
+        entries: [],
+
+        // Entry addition models
+        isAddingEntry: false,
+        entryContent: '',
+
+        // Teacher commentary addition models
+        isAddingComment: false,
+        commentContent: '',
+
+        // Edit modes models
+        editingEntryId: null,
+        editText: '',
+
+        // Initialize application state
+        initApp() {
+          this.loading = true;
+          this.loginError = '';
+          
+          try {
+            // Check if students in LocalStorage
+            let storedStudents = localStorage.getItem('buku_kehidupan_students_demo');
+            if (!storedStudents) {
+              const defaultStudents = [
+                { studentId: 'student_1', studentName: 'Ahmad Dahlan', studentEmail: 'ahmad@siswa.com', createdAt: Date.now() },
+                { studentId: 'student_2', studentName: 'Raden Adjeng Kartini', studentEmail: 'kartini@siswa.com', createdAt: Date.now() - 86400000 },
+                { studentId: 'student_3', studentName: 'Ki Hajar Dewantara', studentEmail: 'kihajar@siswa.com', createdAt: Date.now() - 172800000 }
+              ];
+              localStorage.setItem('buku_kehidupan_students_demo', JSON.stringify(defaultStudents));
+              this.students = defaultStudents;
+            } else {
+              this.students = JSON.parse(storedStudents);
+            }
+
+            // Check if entries in LocalStorage
+            let storedEntries = localStorage.getItem('buku_kehidupan_entries_demo');
+            if (!storedEntries) {
+              const defaultEntries = [
+                // Ahmad Dahlan
+                {
+                  entryId: 'e_1',
+                  chapterId: 'bab1',
+                  chapterTitle: 'Bab 1: Tentang Aku',
+                  content: 'Saya Ahmad Dahlan, sangat menyukai pelajaran Sejarah dan Pancasila. Saya lahir di Yogyakarta dan memiliki hobi bersepeda menyusuri pedesaan hangat.',
+                  authorId: 'student_1',
+                  authorName: 'Ahmad Dahlan',
+                  authorRole: 'siswa',
+                  studentId: 'student_1',
+                  createdAt: Date.now() - 600000
+                },
+                {
+                  entryId: 'e_2',
+                  chapterId: 'bab1',
+                  chapterTitle: 'Bab 1: Tentang Aku',
+                  content: 'Bagus sekali ceritamu Ahmad! Tetaplah rajin mengeksplor sejarah bangsa kita.',
+                  authorId: 'teacher_1',
+                  authorName: 'Bu Kartini, S.Pd.',
+                  authorRole: 'guru',
+                  studentId: 'student_1',
+                  createdAt: Date.now() - 300000
+                },
+                {
+                  entryId: 'e_3',
+                  chapterId: 'bab2',
+                  chapterTitle: 'Bab 2: Kelebihanku',
+                  content: 'Talenta saya adalah mampu bekerja sama dalam tim dan memimpin barisan pramuka sekolah saat upacara hari pramuka.',
+                  authorId: 'student_1',
+                  authorName: 'Ahmad Dahlan',
+                  authorRole: 'siswa',
+                  studentId: 'student_1',
+                  createdAt: Date.now() - 150000
+                },
+                // Ra Kartini
+                {
+                  entryId: 'e_4',
+                  chapterId: 'bab1',
+                  chapterTitle: 'Bab 1: Tentang Aku',
+                  content: 'Saya Raden Adjeng Kartini, paling suka menulis catatan harian, membaca modul kesetaraan, dan berdiskusi kelompok di beranda rumah.',
+                  authorId: 'student_2',
+                  authorName: 'Raden Adjeng Kartini',
+                  authorRole: 'siswa',
+                  studentId: 'student_2',
+                  createdAt: Date.now() - 250000
+                }
+              ];
+              localStorage.setItem('buku_kehidupan_entries_demo', JSON.stringify(defaultEntries));
+              this.entries = defaultEntries;
+            } else {
+              this.entries = JSON.parse(storedEntries);
+            }
+
+            // Check active session
+            let activeSession = localStorage.getItem('buku_kehidupan_active_session');
+            if (activeSession) {
+              this.currentUserProfile = JSON.parse(activeSession);
+              this.view = this.currentUserProfile.role;
+              if (this.view === 'guru' && this.students.length > 0) {
+                this.selectedStudent = this.students[0];
+              }
+            }
+          } catch(e) {
+            console.error('Local Storage setup error:', e);
+          }
+
+          setTimeout(() => {
+            this.loading = false;
+            this.refreshIcons();
+          }, 600);
+        },
+
+        // Helper icons renderer
+        refreshIcons() {
+          this.$nextTick(() => {
+            if (window.lucide) {
+              window.lucide.createIcons();
+            }
+          });
+        },
+
+        // Fast Entry Demo
+        enterDemo(role, name) {
+          if (!name.trim()) {
+            this.loginError = 'Nama simulasi tidak boleh kosong!';
+            return;
+          }
+          this.loginError = '';
+          
+          let uid = role === 'siswa' ? 'student_1' : 'teacher_1';
+          if (role === 'siswa') {
+            // check if there's an existing student with this name, or use the default
+            const match = this.students.find(s => s.studentName.toLowerCase() === name.trim().toLowerCase());
+            if (match) {
+              uid = match.studentId;
+            } else {
+              // Create dynamic student registered
+              uid = 'student_' + Date.now();
+              const newStudent = {
+                studentId: uid,
+                studentName: name.trim(),
+                studentEmail: name.trim().toLowerCase().replace(/[^a-z0-9]/g, '') + '@siswa.com',
+                createdAt: Date.now()
+              };
+              this.students.push(newStudent);
+              localStorage.setItem('buku_kehidupan_students_demo', JSON.stringify(this.students));
+            }
+          }
+
+          const profile = {
+            uid: uid,
+            name: name,
+            email: role === 'siswa' ? name.toLowerCase().replace(/[^a-z0-9]/g, '') + '@siswa.com' : 'guru@buku.com',
+            role: role,
+            createdAt: Date.now()
+          };
+
+          this.currentUserProfile = profile;
+          localStorage.setItem('buku_kehidupan_active_session', JSON.stringify(profile));
+          
+          this.view = role;
+          this.selectedChapterId = 'bab1';
+          if (role === 'guru' && this.students.length > 0) {
+            this.selectedStudent = this.students[0];
+          }
+
+          this.triggerSuccess('Berhasil masuk sebagai ' + name);
+          this.refreshIcons();
+        },
+
+        logout() {
+          localStorage.removeItem('buku_kehidupan_active_session');
+          this.currentUserProfile = null;
+          this.selectedStudent = null;
+          this.view = 'login';
+          this.triggerSuccess('Berhasil keluar portal.');
+          this.refreshIcons();
+        },
+
+        triggerSuccess(text) {
+          this.successMsg = text;
+          setTimeout(() => {
+            this.successMsg = '';
+          }, 3500);
+        },
+
+        getActiveChapter() {
+          return this.chapters.find(c => c.id === this.selectedChapterId) || this.chapters[0];
+        },
+
+        getChapterEmoji(id) {
+          switch(id) {
+            case 'bab1': return '👤';
+            case 'bab2': return '🏆';
+            case 'bab3': return '📈';
+            case 'bab4': return '🎯';
+            case 'bab5': return '🧭';
+            default: return '📖';
+          }
+        },
+
+        // Siswa-specific get entries for active chapter
+        getActiveChapterEntries() {
+          if (!this.currentUserProfile) return [];
+          return this.entries.filter(e => e.chapterId === this.selectedChapterId && e.studentId === this.currentUserProfile.uid)
+                             .sort((a,b) => a.createdAt - b.createdAt);
+        },
+
+        // Guru-specific get entries for selected student & chapter
+        getSelectedStudentEntries() {
+          if (!this.selectedStudent) return [];
+          return this.entries.filter(e => e.chapterId === this.selectedChapterId && e.studentId === this.selectedStudent.studentId)
+                             .sort((a,b) => a.createdAt - b.createdAt);
+        },
+
+        // Student actions
+        submitSiswaEntry() {
+          if (!this.entryContent.trim()) return;
+          
+          const chapter = this.getActiveChapter();
+          const newEntry = {
+            entryId: 'entry_' + Date.now(),
+            chapterId: this.selectedChapterId,
+            chapterTitle: chapter.title,
+            content: this.entryContent.trim(),
+            authorId: this.currentUserProfile.uid,
+            authorName: this.currentUserProfile.name,
+            authorRole: 'siswa',
+            studentId: this.currentUserProfile.uid,
+            createdAt: Date.now()
+          };
+
+          this.entries.push(newEntry);
+          localStorage.setItem('buku_kehidupan_entries_demo', JSON.stringify(this.entries));
+          
+          this.entryContent = '';
+          this.isAddingEntry = false;
+          this.triggerSuccess('Refleksi baru berhasil disimpan!');
+          this.refreshIcons();
+        },
+
+        // Guru actions
+        submitGuruComment() {
+          if (!this.commentContent.trim() || !this.selectedStudent) return;
+
+          const chapter = this.getActiveChapter();
+          const newEntry = {
+            entryId: 'entry_' + Date.now(),
+            chapterId: this.selectedChapterId,
+            chapterTitle: chapter.title,
+            content: this.commentContent.trim(),
+            authorId: this.currentUserProfile.uid,
+            authorName: this.currentUserProfile.name,
+            authorRole: 'guru',
+            studentId: this.selectedStudent.studentId,
+            createdAt: Date.now()
+          };
+
+          this.entries.push(newEntry);
+          localStorage.setItem('buku_kehidupan_entries_demo', JSON.stringify(this.entries));
+
+          this.commentContent = '';
+          this.isAddingComment = false;
+          this.triggerSuccess('Catatan guru berhasil dikirim!');
+          this.refreshIcons();
+        },
+
+        // General Edit/Delete entries
+        startEditingEntry(entry) {
+          this.editingEntryId = entry.entryId;
+          this.editText = entry.content;
+          this.refreshIcons();
+        },
+
+        cancelEdit() {
+          this.editingEntryId = null;
+          this.editText = '';
+        },
+
+        saveEntryEdit(entryId) {
+          if (!this.editText.trim()) return;
+
+          this.entries = this.entries.map(e => {
+            if (e.entryId === entryId) {
+              return { ...e, content: this.editText.trim(), updatedAt: Date.now() };
+            }
+            return e;
+          });
+
+          localStorage.setItem('buku_kehidupan_entries_demo', JSON.stringify(this.entries));
+          this.editingEntryId = null;
+          this.editText = '';
+          this.triggerSuccess('Tulisan berhasil diperbarui!');
+          this.refreshIcons();
+        },
+
+        deleteEntry(entryId) {
+          if (confirm('Apakah Anda yakin ingin menghapus catatan ini?')) {
+            this.entries = this.entries.filter(e => e.entryId !== entryId);
+            localStorage.setItem('buku_kehidupan_entries_demo', JSON.stringify(this.entries));
+            this.triggerSuccess('Catatan berhasil dihapus!');
+            this.refreshIcons();
+          }
+        },
+
+        // Student filters list for Guru Dashboard
+        getFilteredStudents() {
+          if (!this.searchQuery.trim()) return this.students;
+          const query = this.searchQuery.toLowerCase();
+          return this.students.filter(s => 
+            s.studentName.toLowerCase().includes(query) || 
+            s.studentEmail.toLowerCase().includes(query)
+          );
+        },
+
+        selectStudent(student) {
+          this.selectedStudent = student;
+          this.selectedChapterId = 'bab1';
+          this.isAddingComment = false;
+          this.editingEntryId = null;
+          this.refreshIcons();
+        },
+
+        selectChapter(chapterId) {
+          this.selectedChapterId = chapterId;
+          this.isAddingEntry = false;
+          this.editingEntryId = null;
+          this.refreshIcons();
+        },
+
+        formatDate(timestamp) {
+          if (!timestamp) return '';
+          const date = new Date(timestamp);
+          return date.toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+        }
+      }
+    }
+  </script>
+</body>
+</html>
